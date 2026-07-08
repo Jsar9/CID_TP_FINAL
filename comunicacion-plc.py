@@ -40,14 +40,6 @@ ax2.set_ylim([-200,200])
 ax2.grid(True)
 ax2.set_ylabel("Velocidad")
 
-# subfigura 3: pwm (salida del PID)
-line14, = ax3.plot(x, y[2,:], color='g')
-ax3.legend(["control pwm"])
-ax3.set_ylim([-100,100])
-ax3.grid(True)
-ax3.set_xlabel("k")
-ax3.set_ylabel("PWM")
-
 figure.suptitle("Planta Térmica", fontsize=20)
 
 # nombre del archivo csv: output-<timestamp>.csv
@@ -64,25 +56,24 @@ with open("output"+timestr+".csv",'w') as file:
             print(f"Conexión con {addr}")
             try: 
                 while True:
-                    data = conn.recv(12) # tipos de datos en S7-1200: REAL (4 bytes), DInt (4 bytes)
+                    data = conn.recv(8) # tipos de datos en S7-1200: REAL (4 bytes), DInt (4 bytes)
                     if not data:
                         break
                     datareal_pos  = struct.unpack('>f',data[0:4])[0]
                     datareal_vel  = struct.unpack('>f',data[4:8])[0]
-                    datareal_pwm  = struct.unpack('>f',data[8:12])[0]
 
                     # verificamos los datos recibidos imprimiendo por linea de comandos
-                    print(f"recibido: posicion={datareal_pos}, velocidad={datareal_vel}, pwm={datareal_pwm}")
+                    print(f"recibido: posicion={datareal_pos}, velocidad={datareal_vel}")
                     
                     # desplaza los elementos de la lista y en la que guardamos las mediciones
                     y = np.roll(y,-1,axis=1)
                     # agregamos las nuevas lecturas recibidas
-                    y[:,-1] = [datareal_pos,datareal_vel,datareal_pwm]
+                    y[:,-1] = [datareal_pos,datareal_vel]
                     # actualizamos los plots
                     line11.set_xdata(x)
                     line11.set_ydata(y[0,:])
                     line13.set_xdata(x)
-                    line13.set_ydata(y[2,:])
+                    line13.set_ydata(y[1,:]) # antes había un 2, chequear si anda
                     # dibuja los valores actualizados
                     figure.canvas.draw()
                     figure.canvas.flush_events()
