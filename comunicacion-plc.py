@@ -76,7 +76,7 @@ with open("output"+timestr+".csv",'w') as file:
                     line11.set_xdata(x)
                     line11.set_ydata(y[0,:])
                     line13.set_xdata(x)
-                    line13.set_ydata(y[2,:]) # antes había un 2, chequear si anda
+                    line13.set_ydata(y[1,:]) # antes había un 2, chequear si anda
                     # dibuja los valores actualizados
                     figure.canvas.draw()
                     figure.canvas.flush_events()
