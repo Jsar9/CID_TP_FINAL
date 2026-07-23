@@ -13,18 +13,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Configurar puerto y dirección IP de la PC (Servidor) -> PLC (Cliente)
-HOST = "192.168.2.115"  #
+HOST = "192.168.2.241"  #
 PORT = 2000  #
 
 # Inicializar listas para guardar los datos recibidos y graficar
-y = np.zeros((4,1000)) # 4 variables: temp, setpoint, ctrl, ctrlpwm
+y = np.zeros((2,1000)) # 4 variables: temp, setpoint, ctrl, ctrlpwm
 x = np.arange(0,1000)  # vector de indices para graficar: [0,...,1000]
 
 # 
 plt.ion()
  
 # Crear la figura que vamos a ir actualizando con los datos
-figure, (ax1, ax2, ax3) = plt.subplots(3,1,figsize=(10, 10))
+figure, (ax1, ax2) = plt.subplots(2,1,figsize=(10, 10))
 
 # subfigura 1: posicion
 line11, = ax1.plot(x, y[0,:], color='b')
@@ -56,8 +56,11 @@ with open("output"+timestr+".csv",'w') as file:
             print(f"Conexión con {addr}")
             try: 
                 while True:
+                    print("Comienza a tomar datos")
                     data = conn.recv(8) # tipos de datos en S7-1200: REAL (4 bytes), DInt (4 bytes)
+                    print("Tomo datos")
                     if not data:
+                        print("cagaste perro")
                         break
                     datareal_pos  = struct.unpack('>f',data[0:4])[0]
                     datareal_vel  = struct.unpack('>f',data[4:8])[0]
@@ -73,7 +76,7 @@ with open("output"+timestr+".csv",'w') as file:
                     line11.set_xdata(x)
                     line11.set_ydata(y[0,:])
                     line13.set_xdata(x)
-                    line13.set_ydata(y[1,:]) # antes había un 2, chequear si anda
+                    line13.set_ydata(y[2,:]) # antes había un 2, chequear si anda
                     # dibuja los valores actualizados
                     figure.canvas.draw()
                     figure.canvas.flush_events()
