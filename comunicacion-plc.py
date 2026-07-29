@@ -40,7 +40,7 @@ ax2.set_ylim([-200,200])
 ax2.grid(True)
 ax2.set_ylabel("Velocidad")
 
-figure.suptitle("Planta Térmica", fontsize=20)
+figure.suptitle("Carrito", fontsize=20)
 
 # nombre del archivo csv: output-<timestamp>.csv
 timestr = time.strftime("%Y%m%d-%H%M%S")
@@ -56,9 +56,7 @@ with open("output"+timestr+".csv",'w') as file:
             print(f"Conexión con {addr}")
             try: 
                 while True:
-                    print("Comienza a tomar datos")
                     data = conn.recv(8) # tipos de datos en S7-1200: REAL (4 bytes), DInt (4 bytes)
-                    print("Tomo datos")
                     if not data:
                         print("cagaste perro")
                         break
