@@ -6,13 +6,14 @@
 
 
 //Variables para la lectura analógica
-const uint8_t analog_pin = A0; // uint8_t va de 0 a 255, mientras que el nano tiene pocos pines. Se ocupa 1 byte menos que con el int tradicional que es de 2bytes
+const uint8_t analog_pin = A7; // uint8_t va de 0 a 255, mientras que el nano tiene pocos pines. Se ocupa 1 byte menos que con el int tradicional que es de 2bytes
 uint16_t raw_value = 0; // el ADC del arduino, posee resolución de 10 bits (entre 0 y 1023) y es un valor positivo, por lo que este tipo es optimo (lee de 0 a 65535)
+int raw_val_mod = 0; //Los datos raw del arduino se desplazan de [0;1024] a [-512; 512]
+int pwm_val = 0;
 
 //Variables temporales
 unsigned long init_time = 0;
 unsigned long previous_time = 0;
-unsigned long pwm_period = 20; // en ms
 
 void setup() {
 
@@ -23,8 +24,6 @@ void setup() {
  
   Serial.begin(9600);
   Serial.println("BTS7960 Motor Driver Test");
-  
-  init_time = millis()
 }
 
 void loop() {
@@ -47,7 +46,7 @@ void loop() {
   else if(pwm_val >=10) //Avance "+"
   {
       pwm_val = (raw_val_mod * 100)/512.0; //los valores entre -10 y 10, serán zona muerta: el motor se encuentra apagado.
-      digitalWrite(R_EN, RIGHT);
+      digitalWrite(R_EN, HIGH);
       digitalWrite(L_EN, LOW);
       analogWrite(R_PWM, pwm_val); // Set speed (0-255)
       analogWrite(L_PWM, 0);
