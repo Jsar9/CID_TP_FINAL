@@ -17,14 +17,14 @@ HOST = "192.168.2.241"  #
 PORT = 2000  #
 
 # Inicializar listas para guardar los datos recibidos y graficar
-y = np.zeros((2,1000)) # 4 variables: temp, setpoint, ctrl, ctrlpwm
+y = np.zeros((3,1000)) # 3 variables: pos,vel,pwm
 x = np.arange(0,1000)  # vector de indices para graficar: [0,...,1000]
 
 # 
 plt.ion()
  
 # Crear la figura que vamos a ir actualizando con los datos
-figure, (ax1, ax2) = plt.subplots(2,1,figsize=(10, 10))
+figure, (ax1, ax2, ax3) = plt.subplots(3,1,figsize=(10, 10))
 
 # subfigura 1: posicion
 line11, = ax1.plot(x, y[0,:], color='b')
@@ -39,6 +39,13 @@ ax2.legend(["velocidad"])
 ax2.set_ylim([-200,200])
 ax2.grid(True)
 ax2.set_ylabel("Velocidad")
+
+# subfigura 3: pwm
+line15, = ax3.plot(x, y[2,:], color='g')
+ax3.legend(["PWM"])
+ax3.set_ylim([0, 27648])
+ax3.grid(True)
+ax3.set_ylabel("PWM")
 
 figure.suptitle("Carrito", fontsize=20)
 
@@ -56,25 +63,29 @@ with open("output"+timestr+".csv",'w') as file:
             print(f"Conexión con {addr}")
             try: 
                 while True:
-                    data = conn.recv(8) # tipos de datos en S7-1200: REAL (4 bytes), DInt (4 bytes)
+                    data = conn.recv(10) # tipos de datos en S7-1200: REAL (4 bytes), DInt (4 bytes), Int 2bytes
                     if not data:
                         print("cagaste perro")
                         break
                     datareal_pos  = struct.unpack('>f',data[0:4])[0]
                     datareal_vel  = struct.unpack('>f',data[4:8])[0]
+                    dataint_pwm = struct.unpack('>h',data[8:10])[0]
 
                     # verificamos los datos recibidos imprimiendo por linea de comandos
-                    print(f"recibido: posicion={datareal_pos}, velocidad={datareal_vel}")
+                    print(f"recibido: posicion={datareal_pos}, velocidad={datareal_vel}, pwm= {dataint_pwm}")
                     
                     # desplaza los elementos de la lista y en la que guardamos las mediciones
                     y = np.roll(y,-1,axis=1)
                     # agregamos las nuevas lecturas recibidas
-                    y[:,-1] = [datareal_pos,datareal_vel]
+                    y[:,-1] = [datareal_pos, datareal_vel, dataint_pwm]
                     # actualizamos los plots
                     line11.set_xdata(x)
                     line11.set_ydata(y[0,:])
                     line13.set_xdata(x)
-                    line13.set_ydata(y[1,:]) # antes había un 2, chequear si anda
+                    line13.set_ydata(y[1,:])
+                    line15.set_xdata(x)
+                    line15.set_ydata(y[2,:])
+
                     # dibuja los valores actualizados
                     figure.canvas.draw()
                     figure.canvas.flush_events()
