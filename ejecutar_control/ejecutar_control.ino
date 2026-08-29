@@ -3,8 +3,8 @@
 #define R_PWM 6
 #define L_PWM 7
 
-#define INF_THR (-5)
-#define SUP_THR 5
+#define INF_THR (-35)
+#define SUP_THR 35
 
 
 //Variables para la lectura analógica
@@ -35,7 +35,7 @@ void loop() {
   raw_value = analogRead(analog_pin);
 
   //Se desplaza el rango [0; 1023] a [-512; 511]
-  raw_value_mod = raw_value - 512;
+  raw_value_mod = raw_value - 539;
 
   //Si raw_value es un valor entre 0 e inf_thr , se considera que es un valor negativo para el motor -> se acciona "hacia atrás"
   if (raw_value_mod < INF_THR) //Avance "-"
@@ -43,7 +43,7 @@ void loop() {
       //Se hace un cast a long para evitar overflow y luego se divide por 512 que equivale a desplazar 9 bits a derecha
       pwm_val = (uint8_t)((((long)-raw_value_mod) * 255) >> 9);
 
-      digitalWrite(R_EN, LOW);
+      digitalWrite(R_EN, HIGH);
       digitalWrite(L_EN, HIGH);
       analogWrite(R_PWM, 0);
       analogWrite(L_PWM, pwm_val); // Set speed (0-255)
@@ -55,7 +55,7 @@ void loop() {
       pwm_val = (uint8_t)((((long)raw_value_mod) * 255)/ 511);
       
       digitalWrite(R_EN, HIGH);
-      digitalWrite(L_EN, LOW);
+      digitalWrite(L_EN, HIGH);
       analogWrite(R_PWM, pwm_val); // Set speed (0-255)
       analogWrite(L_PWM, 0);
   }
@@ -66,12 +66,14 @@ void loop() {
       analogWrite(R_PWM, 0);
       analogWrite(L_PWM, 0);
   }
-
+  delay(100);
   Serial.print("raw_value:");
-  Serial.println(raw_value);
+  Serial.print(raw_value);
+  Serial.print(" - ");
 
   Serial.print("raw_value_mod: ");
-  Serial.println(raw_value_mod);
+  Serial.print(raw_value_mod);
+  Serial.print(" - ");
 
   Serial.print("pwm_val: ");
   Serial.println(pwm_val);
