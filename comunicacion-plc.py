@@ -36,7 +36,7 @@ ax1.set_ylabel("Posicion")
 # subfigura 2: velocidad
 line13, = ax2.plot(x, y[1,:], color='r')
 ax2.legend(["velocidad"])
-ax2.set_ylim([-200,200])
+ax2.set_ylim([-100,100])
 ax2.grid(True)
 ax2.set_ylabel("Velocidad")
 
