@@ -12,6 +12,7 @@ const uint8_t analog_pin = A7; // uint8_t va de 0 a 255, mientras que el nano ti
 uint16_t raw_value = 0; // el ADC del arduino, posee resolución de 10 bits (entre 0 y 1023) y es un valor positivo, por lo que este tipo es optimo (lee de 0 a 65535)
 int raw_value_mod = 0; //Los datos raw del arduino se desplazan de [0;1024] a [-512; 512]
 uint8_t pwm_val = 0;
+uint8_t offset_value = 27; //offset experimental
 
 
 //Variables temporales
@@ -34,14 +35,14 @@ void loop() {
   //Se lee el valor raw del sensor
   raw_value = analogRead(analog_pin);
 
-  //Se desplaza el rango [0; 1023] a [-512; 511]
-  raw_value_mod = raw_value - 539;
+  //Se desplaza el rango [0; 1023] a [-512; 511] y se resta el offset para acomodar el rango
+  raw_value_mod = raw_value - 512 - offset_value;
 
   //Si raw_value es un valor entre 0 e inf_thr , se considera que es un valor negativo para el motor -> se acciona "hacia atrás"
   if (raw_value_mod < INF_THR) //Avance "-"
   {   
-      //Se hace un cast a long para evitar overflow y luego se divide por 512 que equivale a desplazar 9 bits a derecha
-      pwm_val = (uint8_t)((((long)-raw_value_mod) * 255) >> 9);
+      //Se hace un cast a long para evitar overflow y luego se divide por 539 para ajustar acorde al rango real contemplando el offset
+      pwm_val = (uint8_t)((((long)-raw_value_mod) * 255) / 539);
 
       digitalWrite(R_EN, HIGH);
       digitalWrite(L_EN, HIGH);
@@ -51,8 +52,8 @@ void loop() {
   //Si raw_value es un valor entre sup_thr y 255, se considera que es un valor positivo para el motor -> se acciona "hacia adelante"
   else if(raw_value_mod > SUP_THR) //Avance "+"
   {
-      //Se hace un cast a long para evitar overflow y luego se divide por 511
-      pwm_val = (uint8_t)((((long)raw_value_mod) * 255)/ 511);
+      //Se hace un cast a long para evitar overflow y luego se divide por 484 para ajustar acorde al rango real contemplando el offset
+      pwm_val = (uint8_t)((((long)raw_value_mod) * 255)/ 484);
       
       digitalWrite(R_EN, HIGH);
       digitalWrite(L_EN, HIGH);
