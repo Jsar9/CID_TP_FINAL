@@ -78,7 +78,7 @@ new_df = pd.DataFrame({
     'PWM': pwm_cropped
 })
 
-new_filename = "Mediciones_limpias.csv"
+new_filename = "Mediciones_recortadas.csv"
 
 new_df.to_csv(new_filename, index=False)
 
