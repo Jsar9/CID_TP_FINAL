@@ -9,7 +9,7 @@ t = datos_csv{:, 1};        % Columna 1: Tiempo
 data_ang = datos_csv{:, 2}; % Columna 2: Salida (Aceleración)
 data_u = datos_csv{:, 3};   % Columna 3: Entrada (PWM)
 
-Ts = 0.01;
+Ts = 0.1;
 %%
 % 1. Forzamos formato double y armamos el vector de tiempo
 data_ang = double(data_ang);
@@ -98,14 +98,18 @@ legend('Datos Reales Medidos', 'Modelo H(s) (2 polos reales, 0 ceros)', 'Locatio
 title('Identificación: Planta Continua Sobreamortiguada');
 xlabel('Tiempo (s)'); ylabel('Amplitud'); grid on;
 
-%% Análisis de la Planta
-
+%% Análisis de la Planta - Adaptación al PLC
+% close all;
 %Se añade el retardo de media muestra
 s = tf('s');
 delay_ZOH= exp(-s * (Ts / 2));
 
-%Se estima la planta con el retardo
-Hs_real = Hs * delay_ZOH;
+% Se estima la planta con el retardo y el integrador para la velocidad
+K_PWM = 13824 / 100;
+Hs_fisica = Hs * delay_ZOH * (1/s);
+
+% La planta adaptada solo necesita escalar la entrada del PWM
+Hs_real = K_PWM * Hs_fisica;
 
 options = bodeoptions;
 options.PhaseMatching = 'on';
@@ -132,11 +136,11 @@ fprintf('Sobreimpulso (Overshoot): %.2f %%\n', info_step.Overshoot);
 
 
 %% Diseño del controlador
-
-inc_dB = 30;
+close all;
+inc_dB = 6;
 Kp = db2mag(inc_dB);
-Ki = 350;
-Kd = 1;
+Ki = 0.02;
+Kd = 0.15;
 
 C = pid(Kp, Ki, Kd);
 
@@ -166,6 +170,16 @@ fprintf('Valor final (Ideal = 1.0): %.3f\n', final_value );
 wb = bandwidth(T);
 fprintf('Ancho de banda del lazo cerrado %.2f rad/s\n', wb);
 
-bode(T,options);
-S=1-T;
-bode(S,options);
+% bode(T,options);
+% S=1-T;
+% bode(S,options);
+
+
+Kp_PLC = Kp;
+Ti_PLC = Kp / Ki;
+Td_PLC = Kd / Kp;
+
+fprintf('\n VALORES DIRECTOS PARA TIA PORTAL \n');
+fprintf('Ganancia proporcional: %.4f\n', Kp_PLC);
+fprintf('Tiempo de integración: %.4f s\n', Ti_PLC);
+fprintf('Tiempo derivativo:     %.4f s\n', Td_PLC);
