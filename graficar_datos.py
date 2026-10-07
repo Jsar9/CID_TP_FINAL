@@ -5,7 +5,7 @@ import pandas as pd
 init_time = 0 #secs
 sampling_rate = 0.1 # secs (tiempo de muestreo analógico, el tiempo del OB30 en el PLC)
 
-filename = "Mediciones_para_identificar.csv"
+filename = "output20261007-164931.csv"
 
 df = pd.read_csv(filename)
 

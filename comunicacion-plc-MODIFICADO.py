@@ -24,7 +24,7 @@ x = np.arange(0,1000)  # vector de indices para graficar: [0,...,1000]
 plt.ion()
  
 # Crear la figura que vamos a ir actualizando con los datos
-figure, (ax1, ax2, ax3) = plt.subplots(3,1,figsize=(10, 10, 10))
+figure, (ax1, ax2, ax3) = plt.subplots(3,1,figsize=(10, 10))
 
 # subfigura 1: u
 line11, = ax1.plot(x, y[0,:], color='b')
@@ -33,19 +33,19 @@ ax1.set_ylim([0,120])
 ax1.grid(True)
 ax1.set_ylabel("u")
 
-line12, = ax2.plot(x, y[0,:], color='y')
-ax1.legend(["velocidad"])
-ax1.set_ylim([0,120])
-ax1.grid(True)
-ax1.set_ylabel("velocidad")
+line12, = ax2.plot(x, y[1,:], color='y')
+ax2.legend(["velocidad"])
+ax2.set_ylim([0,120])
+ax2.grid(True)
+ax2.set_ylabel("velocidad")
 
 
 # subfigura 2: velocidad
-line13, = ax2.plot(x, y[1,:], color='r')
-ax2.legend(["PWM"])
-ax2.set_ylim([-100,100])
-ax2.grid(True)
-ax2.set_ylabel("PWM")
+line13, = ax3.plot(x, y[2,:], color='r')
+ax3.legend(["PWM"])
+ax3.set_ylim([-100,100])
+ax3.grid(True)
+ax3.set_ylabel("PWM")
 
 
 figure.suptitle("Carrito", fontsize=20)
