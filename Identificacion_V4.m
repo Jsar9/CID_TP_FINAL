@@ -106,7 +106,7 @@ delay_ZOH= exp(-s * (Ts / 2));
 
 % Se estima la planta con el retardo y el integrador para la velocidad
 K_PWM = 13824 / 100;
-Hs_fisica = Hs * delay_ZOH * (1/s);
+Hs_fisica = Hs * delay_ZOH;
 
 % La planta adaptada solo necesita escalar la entrada del PWM
 Hs_real = K_PWM * Hs_fisica;
@@ -137,10 +137,10 @@ fprintf('Sobreimpulso (Overshoot): %.2f %%\n', info_step.Overshoot);
 
 %% Diseño del controlador
 close all;
-inc_dB = 6;
+inc_dB = 2;
 Kp = db2mag(inc_dB);
-Ki = 0.02;
-Kd = 0.15;
+Ki = 2;%1;
+Kd = 0.0005;%0.1;
 
 C = pid(Kp, Ki, Kd);
 
