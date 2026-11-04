@@ -1,7 +1,7 @@
 #define R_EN 4
 #define L_EN 5
 #define R_PWM 6
-#define L_PWM 7
+#define L_PWM 9
 
 #define INF_THR (-35)
 #define SUP_THR 35
